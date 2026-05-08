@@ -24,7 +24,7 @@ mongoose
 
 //Habilitar puerto
 const puerto =8000;
-app.listen(puerto,() => console.log('Escuchando',puerto));
+app.listen(puerto,() => console.log('Servidor corriendo',puerto));
 
 
 

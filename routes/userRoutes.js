@@ -80,21 +80,34 @@ const jwt = require("jsonwebtoken");
 router.post("/login", async (req, res) => {
   try{
     const {id, password} =req.body;
-    const user = await User.findOne({id});
 
+    // Buscar usuario
+    const user = await User.findOne({id});
     if (!user){
       return res.status(400).json({error: "Usuario no registrado"});
     }
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (isMatch){
+
+    // Comparar contraseña
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword){
       return res.status(400).json({error: "Contraseña incorrecta"});
     }
+
+    // Crear token
     const token =jwt.sign(
       {id:user._id},
       process.env.JWT_SECRET,
       {expiresIn: "1h"}
     );
-    res.json({message: "Login exitoso",}); 
+
+    // Respuesta
+    res.json({message: "Login exitoso",
+      token,
+      user: {
+        name: user.name,
+        email: user.email
+      }
+    }); 
   }
 
   catch (error) {
