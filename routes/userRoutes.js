@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs"); 
 
+// REGISTRO DE USUARIOS
 router.post("/register", async (req, res) => {
   try {
     const { name, second_name, id, email, password, confirmPassword } = req.body;
@@ -55,27 +56,49 @@ router.post("/register", async (req, res) => {
       id,
       email: normalizedEmail,
       password: hashedPassword,
-      confirmPassword
+      confirmPassword: hashedPassword
     });
+    
+    // 9. Mostar datos en consola
+    console.log("Datos recibidos:", req.body);
 
     await newUser.save();
-
-    res.status(201).json({
-      message: "✅ Usuario guardado correctamente"
-    });
-
-  } catch (error) {
+    res.status(201).json({message: "✅ Usuario guardado correctamente"});
+  } 
+  catch (error) {
     console.error(error);
-
     if (error.code === 11000) {
-      return res.status(400).json({
-        error: "El correo o documento ya existen"
-      });
-    }
+      return res.status(400).json({error: "El correo o documento ya existen"});
+      }
+    res.status(500).json({error: "Error interno del servidor"});
+  }
+});
 
-    res.status(500).json({
-      error: "Error interno del servidor"
-    });
+// LOGIN DE USUARIOS
+const jwt = require("jsonwebtoken");
+
+router.post("/login", async (req, res) => {
+  try{
+    const {id, password} =req.body;
+    const user = await User.findOne({id});
+
+    if (!user){
+      return res.status(400).json({error: "Usuario no registrado"});
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (isMatch){
+      return res.status(400).json({error: "Contraseña incorrecta"});
+    }
+    const token =jwt.sign(
+      {id:user._id},
+      process.env.JWT_SECRET,
+      {expiresIn: "1h"}
+    );
+    res.json({message: "Login exitoso",}); 
+  }
+
+  catch (error) {
+    return res.status(500).json({error: "Login incorrecto"});
   }
 });
 
