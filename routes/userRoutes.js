@@ -56,7 +56,7 @@ router.post("/register", async (req, res) => {
       id,
       email: normalizedEmail,
       password: hashedPassword,
-      confirmPassword: hashedPassword
+      confirmPassword
     });
     
     // 9. Mostar datos en consola
@@ -89,6 +89,8 @@ router.post("/login", async (req, res) => {
 
     // Comparar contraseña
     const validPassword = await bcrypt.compare(password, user.password);
+    
+    // Verificar contraseña
     if (!validPassword){
       return res.status(400).json({error: "Contraseña incorrecta"});
     }
@@ -105,7 +107,7 @@ router.post("/login", async (req, res) => {
       token,
       user: {
         name: user.name,
-        email: user.email
+        second_name: user.second_name
       }
     }); 
   }
