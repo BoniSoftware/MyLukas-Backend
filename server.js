@@ -3,7 +3,6 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-
 const app = express();
 
 //Middleware
@@ -14,17 +13,21 @@ app.use((req, res, next) => {
     next (); 
 });
 
+// RUTAS
 const userRoutes  = require("./routes/userRoutes");
 app.use("/api/users", userRoutes);
 
+// MONGODB
 mongoose
 .connect(process.env.MONGO_URI)
 .then(() => console.log('Conectado a MongoDB'))
 .catch((error) => console.error(error));
 
-//Habilitar puerto
+// SERVIDOR - Habilitar puerto
 const puerto =8000;
 app.listen(puerto,() => console.log('Servidor corriendo',puerto));
+
+
 
 
 
